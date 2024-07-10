@@ -1,0 +1,32 @@
+# import numpy as np
+# import sklearn
+#
+# print(np.random.rand())
+from sklearn.datasets import load_diabetes
+diabetes = load_diabetes()
+#print(diabetes.feature_names)
+#print(diabetes.data)
+#print(diabetes.target)
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(
+   diabetes.data, diabetes.target, test_size=0.2)
+#print(X_train.shape, X_test.shape)
+#from sklearn.linear_model import LinearRegression
+arr = [1, 3.2, 2, 5, 8]
+for i in range(len(arr)):
+
+#model = LinearRegression()
+#model.fit(X_train, y_train)
+#y_predict = model.predict(X_test)
+##print(y_predict, y_test)
+#from sklearn.metrics import mean_squared_error
+#mse = mean_squared_error(y_test, y_predict)
+#print(mse)
+   from sklearn.linear_model import Ridge
+   model = Ridge(alpha=arr[i])
+   model.fit(X_train, y_train)
+   y_predict = model.predict(X_test)
+   #print(y_predict, y_test)
+   from sklearn.metrics import mean_squared_error
+   mse = mean_squared_error(y_test, y_predict)
+   print(mse)
