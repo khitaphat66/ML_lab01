@@ -1,0 +1,58 @@
+from matplotlib import pyplot as plt
+from sklearn.datasets import load_wine
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+import pandas as pd
+
+data = load_wine()
+#print(df.target)
+#print("Data (features):")
+#print(df.data)
+#print("จำนวนฟีเจอร์:", len(data.feature_names))
+X = data.data
+y = data.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+##print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+depths = [1, 2, 3, 4, 5, 10, 100, 1000]
+
+results = pd.DataFrame(columns=['max_depth', 'Accuracy', 'Precision', 'Recall', 'F1-score'])
+for depth in depths:
+    # สร้างและฝึกอบรมโมเดล
+    clf = DecisionTreeClassifier(max_depth=depth)
+    clf.fit(X_train, y_train)
+
+    # ทำนายข้อมูล
+    y_pred = clf.predict(X_test)
+
+    # คำนวณเมตริก
+    accuracy = accuracy_score(y_test, y_pred)
+    report = classification_report(y_test, y_pred, output_dict=True)
+
+    # คำนวณ Precision, Recall, F1-score (Macro Average)
+    precision = report['macro avg']['precision']
+    recall = report['macro avg']['recall']
+    f1_score = report['macro avg']['f1-score']
+
+    # เพิ่มข้อมูลลงใน DataFrame
+    result_row = pd.DataFrame({'max_depth': [depth],
+                               'Accuracy': [accuracy],
+                               'Precision': [precision],
+                               'Recall': [recall],
+                               'F1-score': [f1_score]})
+
+    # ใช้ pd.concat เพื่อรวม DataFrame
+    results = pd.concat([results, result_row], ignore_index=True)
+pd.options.display.float_format = '{:.3f}'.format
+
+print(results)
+
+
+plt.figure(figsize=(20,10))
+plot_tree(clf, feature_names=data.feature_names, class_names=data.target_names, filled=True, rounded=True)
+plt.title("Decision Tree Structure")
+plt.show()
+
+
+
