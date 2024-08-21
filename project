@@ -1,0 +1,72 @@
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+from sklearn.tree import plot_tree
+
+# โหลดข้อมูล
+df = pd.read_csv('thailand_foods.csv')
+
+# การแปลงข้อมูล
+le_name = LabelEncoder()
+le_region = LabelEncoder()
+
+df['en_name_encoded'] = le_name.fit_transform(df['en_name'])
+df['region_encoded'] = le_region.fit_transform(df['region'])
+
+# เตรียมข้อมูลสำหรับการฝึกฝนและการทดสอบ
+X = df[['en_name_encoded']]
+y = df['region_encoded']
+
+# แบ่งข้อมูลเป็นชุดฝึกฝนและชุดทดสอบ
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# สร้างและฝึกฝน Decision Tree
+clf = DecisionTreeClassifier(criterion='gini')
+clf.fit(X_train, y_train)
+
+# ฟังก์ชันการคาดการณ์
+def predict_region(dish_name):
+    # ตรวจสอบว่าชื่ออาหารอยู่ในข้อมูลหรือไม่
+    if dish_name not in le_name.classes_:
+        return f"ชื่ออาหาร '{dish_name}' ไม่มีในข้อมูลที่ใช้ฝึกฝน"
+
+    # แปลงชื่ออาหารเป็นตัวเลข
+    dish_name_encoded = le_name.transform([dish_name])[0]
+
+    # ทำนายภูมิภาค
+    region_encoded = clf.predict([[dish_name_encoded]])[0]
+
+    # แปลงภูมิภาคกลับเป็นข้อความ
+    region = le_region.inverse_transform([region_encoded])[0]
+
+    return dish_name, region
+
+# รับข้อมูลชื่ออาหารจากผู้ใช้
+user_dish_name = input('กรุณาพิมพ์ชื่ออาหารที่ต้องการคาดการณ์: ')
+
+# ทำนายภูมิภาคและแสดงผลลัพธ์
+dish_name, predicted_region = predict_region(user_dish_name)
+print(f'ชื่ออาหาร: {dish_name} -> ภาคที่คาดการณ์: {predicted_region}')
+
+# กรองข้อมูลที่เกี่ยวข้อง
+filtered_df = df[df['en_name'] == user_dish_name]
+
+if filtered_df.empty:
+    print(f"ไม่มีข้อมูลสำหรับชื่ออาหาร '{user_dish_name}'")
+else:
+    # เตรียมข้อมูลสำหรับการฝึกฝนและการทดสอบ
+    X_filtered = filtered_df[['en_name_encoded']]
+    y_filtered = filtered_df['region_encoded']
+
+    # สร้างและฝึกฝน Decision Tree ใหม่สำหรับข้อมูลที่กรอง
+    clf_filtered = DecisionTreeClassifier(criterion='gini')
+    clf_filtered.fit(X_filtered, y_filtered)
+
+    # แสดงผล Decision Tree สำหรับข้อมูลที่กรอง
+    plt.figure(figsize=(10,5))
+    plot_tree(clf_filtered, feature_names=['en_name_encoded'], class_names=le_region.classes_, filled=True)
+    plt.title(f'Decision Tree for {user_dish_name}')
+    plt.show()
