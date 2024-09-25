@@ -1,0 +1,75 @@
+from sklearn.datasets import load_breast_cancer
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+
+data = load_breast_cancer()
+X = data.data
+y = data.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+clf = DecisionTreeClassifier().fit(X_train,y_train)
+y_pred = clf.predict(X_test)
+print("Decision Tree")
+print(f"Accuracy: {accuracy_score(y_test, y_pred):.3f}")
+print(f"Precision: {precision_score(y_test, y_pred):.3f}")
+print(f"Recall: {recall_score(y_test, y_pred):.3f}")
+print('-----------------------------------------------------------')
+
+from sklearn.datasets import load_breast_cancer
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.feature_selection import SelectKBest, f_classif
+
+data = load_breast_cancer()
+X = data.data
+y = data.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+anova_selector = SelectKBest(score_func=f_classif, k=25)  # Select the top 10 features
+X_train = anova_selector.fit_transform(X_train, y_train)
+X_test = anova_selector.transform(X_test)
+
+
+# Create and train the Decision Tree classifier
+clf = DecisionTreeClassifier() .fit(X_train, y_train)
+
+y_pred = clf.predict(X_test)
+
+print("Decision Tree with ANOVA")
+print(f"Accuracy: {accuracy_score(y_test, y_pred):.3f}")
+print(f"Precision: {precision_score(y_test, y_pred):.3f}")
+print(f"Recall: {recall_score(y_test, y_pred):.3f}")
+print('-----------------------------------------------------------')
+
+from sklearn.datasets import load_breast_cancer
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.feature_selection import RFE
+
+data = load_breast_cancer()
+X = data.data
+y = data.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+clf = DecisionTreeClassifier() .fit(X_train, y_train)
+
+
+selectored_rfe = RFE(estimator=clf, n_features_to_select=10)  # Select the top 10 features
+X_train_rfe = selectored_rfe.fit_transform(X_train, y_train)
+X_test_rfe = selectored_rfe.transform(X_test)
+
+select_fea = selectored_rfe.get_support(indices=True)
+feature_name = [data.feature_names[i] for i in select_fea]
+print(feature_name)
+
+y_pred = clf.predict(X_test)
+
+print("Decision Tree with RFE")
+print(f"Accuracy: {accuracy_score(y_test, y_pred):.3f}")
+print(f"Precision: {precision_score(y_test, y_pred):.3f}")
+print(f"Recall: {recall_score(y_test, y_pred):.3f}")
+print('-----------------------------------------------------------')
