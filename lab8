@@ -1,0 +1,42 @@
+from matplotlib import pyplot as plt
+from sklearn import datasets
+from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram, linkage
+
+iris = datasets.load_iris()
+X = iris.data
+y = iris.target
+
+model = AgglomerativeClustering(n_clusters=3)
+model.fit(X)
+
+for i in range(len(y)):
+    print(model.labels_[i], "\t", y[i])
+
+linkage_matrix = linkage(X, method='ward')
+plt.figure(figsize=(10, 7))
+dendrogram(linkage_matrix, labels=iris.target_names[y], leaf_rotation=90)
+plt.title("Dendrogram for Iris Dataset")
+plt.xlabel("Species")
+plt.ylabel("Euclidean Distance")
+plt.show()
+
+#3 คลัสเตอร์
+linkage_matrix = linkage(X, method='ward')
+plt.figure(figsize=(10, 7))
+dendrogram(linkage_matrix, labels=iris.target_names[y], leaf_rotation=90)
+plt.title("Dendrogram for Iris Dataset")
+plt.xlabel("Species")
+plt.ylabel("Euclidean Distance")
+plt.axhline(y=7.5, color='r', linestyle='--')  # ปรับค่า y ตามความเหมาะสม
+plt.show()
+
+#5 คลัสเตอร์
+linkage_matrix = linkage(X, method='ward')
+plt.figure(figsize=(10, 7))
+dendrogram(linkage_matrix, labels=iris.target_names[y], leaf_rotation=90)
+plt.title("Dendrogram for Iris Dataset")
+plt.xlabel("Species")
+plt.ylabel("Euclidean Distance")
+plt.axhline(y=4.3, color='r', linestyle='--')  # ปรับค่า y ให้เหมาะสมกับการแยกเป็น 5 คลัสเตอร์
+plt.show()
